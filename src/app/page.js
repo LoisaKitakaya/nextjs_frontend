@@ -8,7 +8,9 @@ import { toast } from "react-hot-toast";
 // @param {string} query - The user's input query (e.g., "What can I cook with chicken, rice, and broccoli?")
 async function getRecipe(query) {
   const backendUrl =
-    process.env.BACKEND_URL || "http://127.0.0.1:8000/api/query";
+    process.env.NODE_ENV === "production"
+      ? process.env.NEXT_PUBLIC_BACKEND_URL
+      : "http://127.0.0.1:8000/api/query";
 
   const options = {
     method: "POST",
