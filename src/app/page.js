@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 // Fetches recipe data from the FastAPI backend based on user query
 // @param {string} query - The user's input query (e.g., "What can I cook with chicken, rice, and broccoli?")
@@ -14,11 +15,17 @@ async function getRecipe(query) {
     body: JSON.stringify({ query }),
   };
 
-  const response = await fetch(backendUrl, options);
+  try {
+    const response = await fetch(backendUrl, options);
 
-  if (!response.ok) throw new Error("Failed to fetch recipe");
-
-  return response.json();
+    return await response.json();
+  } catch (error) {
+    throw new Error(
+      error instanceof Error
+        ? toast.error(error.message)
+        : toast.error("Network error")
+    );
+  }
 }
 
 // Main Home component for the Recipe and Meal Planning frontend
@@ -37,9 +44,19 @@ export default function Home() {
     try {
       const data = await getRecipe(query);
 
-      setResponse(data);
+      if (data && data.status_code >= 400) {
+        console.log(data.status_code);
+
+        toast.error(data.error);
+      } else {
+        setResponse(data);
+      }
     } catch (error) {
-      console.error(error);
+      toast.error(
+        error instanceof Error
+          ? toast.error("Error fetching recipe:", error.message)
+          : "An unexpected error occurred"
+      );
     }
 
     setLoading(false);
@@ -49,34 +66,36 @@ export default function Home() {
   return (
     <>
       <div className="min-h-screen bg-base-200 p-6">
-        {/* Page title */}
         <h1 className="text-3xl font-bold text-center mb-6">
           Recipe and Meal Planning
         </h1>
-        {/* Form card for user query input */}
+
         <div className="card bg-base-100 shadow-xl max-w-2xl mx-auto">
           <div className="card-body">
             <form onSubmit={handleSubmit}>
-              {/* Textarea for entering the recipe query */}
               <textarea
                 className="textarea textarea-bordered w-full mb-4"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="What can I cook with chicken, rice, and broccoli?"
               />
-              {/* Submit button with loading state */}
+
               <button
                 type="submit"
-                className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
+                className="btn btn-primary w-full"
                 disabled={loading}
               >
-                {loading ? "Loading..." : "Get Recipe"}
+                {loading ? (
+                  <span className="loading loading-bars loading-md"></span>
+                ) : (
+                  "Get Recipe"
+                )}
               </button>
             </form>
           </div>
         </div>
-        {/* Display recipe response if available */}
-        {response && (
+
+        {response && response.details && (
           <div className="card bg-base-100 shadow-xl max-w-2xl mx-auto mt-6">
             <div className="card-body">
               {/* Recipe summary */}
@@ -88,19 +107,32 @@ export default function Home() {
                 <strong>Recipe:</strong> {response.details.recipe_name}
               </p>
               {/* List of ingredients */}
-              <p>
-                <strong>Ingredients:</strong>{" "}
-                {response.details.ingredients.join(", ")}
-              </p>
+              <div>
+                <strong>Ingredients:</strong>
+                <ol className="list-decimal list-inside ml-4">
+                  {response.details.ingredients.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ol>
+              </div>
               {/* Cooking instructions */}
-              <p>
-                <strong>Instructions:</strong>{" "}
-                {response.details.instructions.join(", ")}
-              </p>
+              <div>
+                <strong>Instructions:</strong>
+                <ol className="list-decimal list-inside ml-4">
+                  {response.details.instructions.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ol>
+              </div>
               {/* Cooking tips */}
-              <p>
-                <strong>Tips:</strong> {response.details.tips.join(", ")}
-              </p>
+              <div>
+                <strong>Tips:</strong>
+                <ol className="list-decimal list-inside ml-4">
+                  {response.details.tips.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ol>
+              </div>
               {/* Preparation time */}
               <p>
                 <strong>Prep Time:</strong> {response.details.prep_time}
