@@ -36,13 +36,21 @@ This project is a Next.js-based frontend for a Recipe and Meal Planning App, des
    npm install
    ```
 
-3. **Run the Application**:
+3. Set Up Environment Variables:
+
+   - Create a .env file in the project
+
+```bash
+NEXT_PUBLIC_BACKEND_URL="http://127.0.0.1:8000/api/query"
+```
+
+4. **Run the Application**:
 
    ```bash
    npm run dev
    ```
 
-4. **Access the App**:
+5. **Access the App**:
 
    - Open [http://localhost:3000](http://localhost:3000) in a browser.
    - Use the interactive interface to submit queries and view recipes.
@@ -57,7 +65,15 @@ This project is a Next.js-based frontend for a Recipe and Meal Planning App, des
    cd nextjs_frontend
    ```
 
-2. **Run with Docker Compose**:
+2. Set Up Environment Variables:
+
+   - Create a .env file in the project
+
+```bash
+NEXT_PUBLIC_BACKEND_URL="http://127.0.0.1:8000/api/query"
+```
+
+3. **Run with Docker Compose**:
 
    - From the `nextjs_frontend/` directory:
 
@@ -67,12 +83,12 @@ This project is a Next.js-based frontend for a Recipe and Meal Planning App, des
 
    - This starts both the frontend `recipe-frontend` services.
 
-3. **Access the App**:
+4. **Access the App**:
 
    - Open [http://localhost:3000](http://localhost:3000) to use the frontend.
    - Verify the backend at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-4. **Stop the Containers**:
+5. **Stop the Containers**:
 
    ```bash
    docker-compose down
@@ -126,6 +142,7 @@ nextjs_frontend/
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   ├── page.tsx
+├── .env
 ├── .gitignore
 ├── docker-compose.yml
 ├── Dockerfile
